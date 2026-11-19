@@ -34,3 +34,8 @@ def test_text_and_line_breaks():
 def test_table_kept_as_rows():
     t = html_to_text(HTML)
     assert "[TABLE]\nRevenue | 1,000\nNet income | (50\n[/TABLE]" in t
+
+
+def test_table_cell_does_not_split_words_across_spans():
+    t = html_to_text("<table><tr><td>Disagreements w<span>ith</span> Accountants</td></tr></table>")
+    assert "Disagreements with Accountants" in t
