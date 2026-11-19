@@ -39,6 +39,7 @@ METRICS: dict[str, list[str]] = {
     "provision_for_credit_losses": [
         "ProvisionForCreditLosses",
         "ProvisionForLoanLeaseAndOtherLosses",
+        "ProvisionForLoanLossesExpensed",
         "ProvisionForLoanAndLeaseLosses",
         "ProvisionForDoubtfulAccounts",
     ],
@@ -127,6 +128,33 @@ def find_main(pattern: str) -> None:
             print(f"  {ns}:{tag}  ({n} values)")
 
 
+def show_entries(facts: dict, tag: str, accessions: set[str]) -> list[dict]:
+    """Every value of `tag` (any namespace) that belongs to one of our filings.
+
+    Debug aid: shows why a metric did not match (different end date, duration, accession).
+    """
+    out = []
+    for ns, tags in facts.get("facts", {}).items():
+        for e in tags.get(tag, {}).get("units", {}).get("USD", []):
+            if e.get("accn") in accessions:
+                out.append({"ns": ns, **e})
+    return sorted(out, key=lambda e: (e["accn"], e["end"], e.get("start", "")))
+
+
+def show_main(tag: str) -> None:
+    ua = get_user_agent()
+    by_ticker = {c.ticker: c for c in load_companies().companies}
+    manifest = read_manifest()
+    for t in by_ticker:
+        accs = {m["accession"] for m in manifest if m["ticker"] == t}
+        print(f"== {t} {tag}")
+        for e in show_entries(fetch_companyfacts(by_ticker[t].cik, ua), tag, accs):
+            print(
+                f"  accn={e['accn']} {e.get('start', '-')}..{e['end']} "
+                f"val={e['val']} form={e.get('form')} fp={e.get('fp')}"
+            )
+
+
 def main() -> None:
     ua = get_user_agent()
     by_ticker = {c.ticker: c for c in load_companies().companies}
@@ -152,5 +180,7 @@ if __name__ == "__main__":
 
     if len(sys.argv) == 3 and sys.argv[1] == "find":
         find_main(sys.argv[2])
+    elif len(sys.argv) == 3 and sys.argv[1] == "show":
+        show_main(sys.argv[2])
     else:
         main()
