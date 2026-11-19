@@ -49,3 +49,8 @@ Every choice and why. Add an entry whenever you pick between options. Status: `a
 - **Why CSV:** the table is tiny (about 40 rows). Parquet would add pandas and pyarrow for no benefit. Can switch later without changing callers.
 - **Why accession:** a 10-K also contains prior-year numbers and later filings restate them. Taking only values tagged with the filing's own accession, at its own period end, makes each number traceable to one document, which is what citations need.
 - **Why several tags per metric:** companies tag the same concept differently (e.g. revenue). The tag used is stored in `source_tag`.
+
+## D-013: provision for credit losses is not in XBRL companyfacts for PYPL and COIN; answer from text (accepted, Stage 2)
+- **Evidence:** `xbrl show` for the tags PayPal and Coinbase could use returned nothing for our filings' accession numbers. The tags exist only in other filings. Companyfacts exposes standard taxonomies only, and a company's own extension tags (e.g. PayPal's "transaction and credit losses" line) are not included.
+- **Decision:** keep `provision_for_credit_losses` as an optional metric. Affirm has it (`ProvisionForLoanLossesExpensed`). For PYPL and COIN the facts tool must return "not available" and the agent falls back to the MD&A text, which is a real case for the agentic fallback in Stage 8.
+- **Not done:** parsing the numbers out of income-statement tables to fill the gap. Revisit only if numeric questions on these two fail.

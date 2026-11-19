@@ -1,4 +1,4 @@
-from finfilings.ingest.xbrl import extract_facts, find_tags, period_end_for
+from finfilings.ingest.xbrl import extract_facts, find_tags, period_end_for, show_entries
 
 ACC = "0001-25-000002"
 OLD = "0001-24-000001"
@@ -52,3 +52,8 @@ def test_find_tags_searches_company_extensions_too():
         }
     }
     assert find_tags(facts, "provision") == [("afrm", "ProvisionForCreditLosses", 2)]
+
+
+def test_show_entries_only_returns_our_accessions():
+    out = show_entries(FACTS, "Assets", {ACC})
+    assert [(e["end"], e["val"]) for e in out] == [("2024-12-31", 5000)]
