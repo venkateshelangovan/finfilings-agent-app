@@ -24,8 +24,8 @@ manifest:  ## Stage 1.1: list 10-Ks on EDGAR, write data/manifest.csv
 	uv run python -m finfilings.ingest.list_filings
 
 # Pipeline targets are filled in by later stages.
-data:
-	@echo "Stage 1: not implemented yet"
+data:  ## Stage 1.2: download filings listed in manifest, record hashes
+	uv run python -m finfilings.ingest.download
 index:
 	@echo "Stage 3: not implemented yet"
 eval:
