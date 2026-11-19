@@ -1,0 +1,6 @@
+mode: dense              # dense | hybrid
+top_k: 8
+rrf_k: 60
+rerank: false
+reranker_model: BAAI/bge-reranker-base
+metadata_filters: false

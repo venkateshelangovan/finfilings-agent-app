@@ -1,0 +1,20 @@
+# Companies and fiscal years in scope. MVP = 3 companies (see DECISIONS.md D-004).
+# CIKs and fiscal years are provisional: Stage 1 verifies them against EDGAR
+# (submissions API) before any download. Do not trust until verified.
+verified: false
+companies:
+  - ticker: PYPL
+    name: PayPal Holdings, Inc.
+    cik: 1633917
+    fiscal_years: [2024, 2025]
+  - ticker: AFRM
+    name: Affirm Holdings, Inc.
+    cik: 1820953
+    fiscal_years: [2025, 2026]   # fiscal year ends June 30
+  - ticker: COIN
+    name: Coinbase Global, Inc.
+    cik: 1679788
+    fiscal_years: [2024, 2025]
+
+# Added after the MVP checkpoint (uncomment in Stage 1+ once verified):
+#  V, MA, HOOD, SOFI, UPST
