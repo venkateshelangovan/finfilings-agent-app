@@ -40,3 +40,18 @@ def load_companies(path: Path | None = None) -> CompaniesConfig:
     path = path or CONFIG_DIR / "companies.yaml"
     with open(path) as f:
         return CompaniesConfig.model_validate(yaml.safe_load(f))
+
+
+class ChunkingConfig(BaseModel):
+    chunk_tokens: int = Field(600, gt=50)
+    max_chunk_tokens: int = Field(800, gt=50)
+    chars_per_token: float = Field(4, gt=0)
+    overlap_ratio: float = Field(0.12, ge=0, le=0.3)
+    cross_section: bool = False
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
+
+
+def load_chunking(path: Path | None = None) -> ChunkingConfig:
+    path = path or CONFIG_DIR / "chunking.yaml"
+    with open(path) as f:
+        return ChunkingConfig.model_validate(yaml.safe_load(f))

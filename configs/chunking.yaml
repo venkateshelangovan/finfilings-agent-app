@@ -1,5 +1,7 @@
 # Values are config, not constants, so Stage 7 can ablate them.
 chunk_tokens: 600        # target 400-800
+max_chunk_tokens: 800    # hard cap, used for large tables
+chars_per_token: 4       # token estimate without a tokenizer (D-014)
 overlap_ratio: 0.12      # 10-15%
 cross_section: false     # never cross section boundaries
 embedding_model: BAAI/bge-small-en-v1.5

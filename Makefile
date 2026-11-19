@@ -1,4 +1,4 @@
-.PHONY: setup lint format test check clean manifest data text sections facts qa index eval
+.PHONY: setup lint format test check clean manifest data text sections facts qa chunks index eval
 
 setup:  ## install dependencies and git hooks
 	uv sync
@@ -37,6 +37,9 @@ facts:  ## Stage 2.3: XBRL numbers -> data/processed/facts.csv
 
 qa:  ## Stage 2.4: check parsed sections (fails if parsing is broken)
 	uv run python -m finfilings.ingest.qa
+
+chunks:  ## Stage 3.1: sections -> data/processed/chunks.jsonl
+	uv run python -m finfilings.index.chunk
 
 index:
 	@echo "Stage 3: not implemented yet"
