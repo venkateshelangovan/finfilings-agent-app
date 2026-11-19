@@ -8,11 +8,15 @@ Run:  uv run python -m finfilings.ingest.parse
 from __future__ import annotations
 
 import re
+import warnings
 
-from bs4 import BeautifulSoup, NavigableString
+from bs4 import BeautifulSoup, NavigableString, XMLParsedAsHTMLWarning
 
 from finfilings.config import REPO_ROOT
 from finfilings.ingest.download import raw_path, read_manifest
+
+# 10-Ks are XHTML; the HTML parser handles them fine, so silence the noisy warning.
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 TEXT_DIR = REPO_ROOT / "data" / "processed" / "text"
 BLOCK_TAGS = ["p", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6"]
