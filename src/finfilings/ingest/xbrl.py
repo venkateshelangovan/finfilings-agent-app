@@ -101,6 +101,32 @@ def extract_facts(facts: dict, ticker: str, fiscal_year: int, accession: str) ->
     return rows
 
 
+def find_tags(facts: dict, pattern: str) -> list[tuple[str, str, int]]:
+    """Search ALL namespaces (us-gaap and company extensions) for tags matching `pattern`.
+
+    Returns (namespace, tag, number_of_USD_values). Used to discover how a company tagged a
+    concept that METRICS does not cover yet.
+    """
+    import re
+
+    rx = re.compile(pattern, re.I)
+    found = []
+    for ns, tags in facts.get("facts", {}).items():
+        for tag, node in tags.items():
+            n = len(node.get("units", {}).get("USD", []))
+            if n and rx.search(tag):
+                found.append((ns, tag, n))
+    return sorted(found)
+
+
+def find_main(pattern: str) -> None:
+    ua = get_user_agent()
+    for c in load_companies().companies:
+        print(f"== {c.ticker}")
+        for ns, tag, n in find_tags(fetch_companyfacts(c.cik, ua), pattern):
+            print(f"  {ns}:{tag}  ({n} values)")
+
+
 def main() -> None:
     ua = get_user_agent()
     by_ticker = {c.ticker: c for c in load_companies().companies}
@@ -122,4 +148,9 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    if len(sys.argv) == 3 and sys.argv[1] == "find":
+        find_main(sys.argv[2])
+    else:
+        main()

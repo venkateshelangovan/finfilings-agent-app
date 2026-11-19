@@ -1,4 +1,4 @@
-from finfilings.ingest.xbrl import extract_facts, period_end_for
+from finfilings.ingest.xbrl import extract_facts, find_tags, period_end_for
 
 ACC = "0001-25-000002"
 OLD = "0001-24-000001"
@@ -42,3 +42,13 @@ def test_extract_picks_current_full_year_and_falls_back_on_tag():
     assert rows["revenue"][5] == "RevenueFromContractWithCustomerExcludingAssessedTax"
     assert rows["total_assets"][3] == 5000
     assert "net_income" not in rows
+
+
+def test_find_tags_searches_company_extensions_too():
+    facts = {
+        "facts": {
+            "us-gaap": {"Assets": {"units": {"USD": [{}]}}},
+            "afrm": {"ProvisionForCreditLosses": {"units": {"USD": [{}, {}]}}},
+        }
+    }
+    assert find_tags(facts, "provision") == [("afrm", "ProvisionForCreditLosses", 2)]

@@ -3,6 +3,7 @@
 What was done, numbers obtained, what failed. Newest first.
 
 ## 2026-11-19: Stage 2.3 (XBRL facts)
+- **Real results:** `make sections` found all 6 Items in all 6 filings (PYPL Item 8 = 260-301 chars, a pointer; its statements are in Item 15 at ~216k chars). `make facts`: 6/7 metrics for every filing; `provision_for_credit_losses` missing everywhere, probably because it is tagged in a company extension namespace (my code only read us-gaap). Added `find` helper: `uv run python -m finfilings.ingest.xbrl find provision`.
 - Added `ingest/xbrl.py`: calls SEC `companyfacts`, keeps only values from each manifest filing (matched by accession number), at that filing's fiscal year end, full-year duration for flow items. Tries several tags per metric and records which one matched (`source_tag`).
 - 2 tests with a fake companyfacts JSON (15 pass total). **Not run on real SEC data.**
 - **Your run:** `make facts`, paste the output. Any `missing:` metric means that company uses a tag I did not list; we add it from the real data.
