@@ -2,6 +2,10 @@
 
 What was done, numbers obtained, what failed. Newest first.
 
+## 2026-11-19: Stage 2.3b (provision metric)
+- Tag finder showed all candidate tags are standard us-gaap, not extensions. `show` returned **no entries for our accession numbers** for PYPL (ProvisionForLoanLeaseAndOtherLosses) and COIN (ProvisionForDoubtfulAccounts), so those companies' provision line is not available via companyfacts (D-013). Affirm tag `ProvisionForLoanLossesExpensed` added.
+- **Your run:** `make facts`; expect AFRM 7/7, PYPL and COIN 6/7.
+
 ## 2026-11-19: Stage 2.3 (XBRL facts)
 - **Real results:** `make sections` found all 6 Items in all 6 filings (PYPL Item 8 = 260-301 chars, a pointer; its statements are in Item 15 at ~216k chars). `make facts`: 6/7 metrics for every filing; `provision_for_credit_losses` missing everywhere, probably because it is tagged in a company extension namespace (my code only read us-gaap). Added `find` helper: `uv run python -m finfilings.ingest.xbrl find provision`.
 - Added `ingest/xbrl.py`: calls SEC `companyfacts`, keeps only values from each manifest filing (matched by accession number), at that filing's fiscal year end, full-year duration for flow items. Tries several tags per metric and records which one matched (`source_tag`).
