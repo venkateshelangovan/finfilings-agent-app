@@ -20,7 +20,7 @@ question types, and at what cost in latency and money?
 |---|---|---|
 | 0 | Scope, repo setup, decisions | done |
 | 1 | Data acquisition (EDGAR) | done (6 filings, hashes in manifest) |
-| 2 | Parsing and cleaning | **in progress**: 2.1 HTML to clean text (done); 2.2 sections (PR #4); 2.3 XBRL facts (this PR); 2.4 QA checks next |
+| 2 | Parsing and cleaning | **in progress**: 2.1-2.3 done; 2.4 QA checks (this PR) |
 | 3 | Chunking and indexing | - |
 | 4 | Baseline RAG | - |
 | 5 | Evaluation dataset | - |
@@ -53,6 +53,8 @@ Stage 2.1: `make text` converts raw HTML into clean text in `data/processed/text
 Stage 2.2: `make sections` splits the text into Items 1, 1A, 7, 7A, 8, 15 and writes `data/processed/sections.jsonl`.
 
 Stage 2.3: `make facts` pulls exact numbers (revenue, net income, provision, assets, ...) from SEC XBRL into `data/processed/facts.csv`.
+
+Stage 2.4: `make qa` checks the parsed sections and fails if anything looks wrong; `uv run python -m finfilings.ingest.qa --sample` prints 5 sections to read by eye.
 
 Later targets (`make index`, `make eval`) are stubs until their stages land.
 
