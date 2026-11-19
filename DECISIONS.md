@@ -29,3 +29,10 @@ Every choice and why. Add an entry whenever you pick between options. Status: `a
 
 ## D-007: Tests and CI never call the network or a paid LLM (accepted, Stage 0)
 - **Why:** deterministic, free, safe. Tests needing either are marked `network` / `llm` and excluded in CI.
+
+## D-008: fiscal_year = year of the fiscal period end date (accepted, Stage 1)
+- **Why:** EDGAR gives `reportDate` (period end). PayPal and Coinbase end Dec 31, so FY2024 = period ending 2024-12-31. Affirm ends June 30, so FY2025 = period ending 2025-06-30. One simple rule, no company-specific exceptions.
+- **Risk:** companies with 52/53-week years ending in early January would shift a year. None in scope.
+
+## D-009: original 10-K only, skip 10-K/A amendments (accepted, Stage 1)
+- **Why:** amendments are often partial (e.g. only Part III) and would create duplicate or incomplete documents. Revisit if a company's original is missing.
