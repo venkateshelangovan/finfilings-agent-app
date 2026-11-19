@@ -83,3 +83,8 @@ def test_tiny_chunks_are_merged_but_never_exceed_the_cap():
         if c["kind"] == "text" or len(c["text"]) < 320:
             s, e = c["char_span"]
             assert text[s:e] == c["text"]
+
+
+def test_marker_only_chunks_are_dropped():
+    chunks = run("[TABLE]\n\n[TABLE]\n[/TABLE]\n" + PROSE)
+    assert all(re.sub(r"\[/?TABLE\]|\s", "", c["text"]) for c in chunks)

@@ -124,6 +124,7 @@ def chunk_section(
             for s, e, t in _table_pieces(text, m.start(), m.end(), max_chars):
                 raw.append((s, e, t, "table", t == text[s:e]))
             cursor = m.end()
+    raw = [r for r in raw if re.sub(r"\[/?TABLE\]|\s", "", r[2])]  # drop marker-only chunks
     raw.sort(key=lambda r: r[0])
     raw = _merge_small(text, raw, int(cfg.min_chunk_tokens * cfg.chars_per_token), max_chars)
 
