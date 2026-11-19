@@ -1,4 +1,4 @@
-.PHONY: setup lint format test check clean manifest data text sections index eval
+.PHONY: setup lint format test check clean manifest data text sections facts index eval
 
 setup:  ## install dependencies and git hooks
 	uv sync
@@ -31,6 +31,9 @@ text:  ## Stage 2.1: raw HTML -> clean text in data/processed/text/
 
 sections:  ## Stage 2.2: clean text -> data/processed/sections.jsonl
 	uv run python -m finfilings.ingest.sections
+
+facts:  ## Stage 2.3: XBRL numbers -> data/processed/facts.csv
+	uv run python -m finfilings.ingest.xbrl
 
 index:
 	@echo "Stage 3: not implemented yet"
