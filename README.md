@@ -21,7 +21,7 @@ question types, and at what cost in latency and money?
 | 0 | Scope, repo setup, decisions | done |
 | 1 | Data acquisition (EDGAR) | done (6 filings, hashes in manifest) |
 | 2 | Parsing and cleaning | done |
-| 3 | Chunking and indexing | **in progress**: 3.1 chunking (this PR); 3.2 embeddings + dense index, 3.3 BM25 next |
+| 3 | Chunking and indexing | **in progress**: 3.1 chunking (done); 3.2 embeddings + dense index (this PR); 3.3 BM25 next |
 | 4 | Baseline RAG | - |
 | 5 | Evaluation dataset | - |
 | 6 | Evaluation harness | - |
@@ -40,7 +40,7 @@ Prerequisites: Python 3.11+ and [uv](https://docs.astral.sh/uv/).
 git clone https://github.com/venkateshelangovan/finfilings-agent-app.git
 cd finfilings-agent-app
 cp .env.example .env     # fill in later stages; never commit .env
-make setup               # install deps + git hooks
+make setup               # install deps (incl. embedding stack, ~1 GB) + git hooks
 make check               # ruff + pytest (what CI runs)
 ```
 
@@ -57,6 +57,9 @@ Stage 2.3: `make facts` pulls exact numbers (revenue, net income, provision, ass
 Stage 2.4: `make qa` checks the parsed sections and fails if anything looks wrong; `uv run python -m finfilings.ingest.qa --sample` prints 5 sections to read by eye.
 
 Stage 3.1: `make chunks` writes `data/processed/chunks.jsonl` (section-aware chunks, tables kept separate, char spans for citations).
+
+Stage 3.2: `make index` embeds the chunks (downloads `bge-small-en-v1.5`, ~130 MB, first time only). Try it:
+`uv run python -m finfilings.retrieval.dense "PayPal fraud losses" --ticker PYPL -k 5`
 
 Later targets (`make index`, `make eval`) are stubs until their stages land.
 

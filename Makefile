@@ -1,7 +1,7 @@
 .PHONY: setup lint format test check clean manifest data text sections facts qa chunks index eval
 
 setup:  ## install dependencies and git hooks
-	uv sync
+	uv sync --all-groups
 	uv run pre-commit install
 
 lint:
@@ -41,7 +41,8 @@ qa:  ## Stage 2.4: check parsed sections (fails if parsing is broken)
 chunks:  ## Stage 3.1: sections -> data/processed/chunks.jsonl
 	uv run python -m finfilings.index.chunk
 
-index:
-	@echo "Stage 3: not implemented yet"
+index:  ## Stage 3.2: embed chunks, save dense index (needs the ml group)
+	uv run python -m finfilings.index.embed
+
 eval:
 	@echo "Stage 6: not implemented yet"
