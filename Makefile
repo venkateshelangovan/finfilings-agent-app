@@ -1,4 +1,4 @@
-.PHONY: setup lint format test check clean data index eval
+.PHONY: setup lint format test check clean manifest data index eval
 
 setup:  ## install dependencies and git hooks
 	uv sync
@@ -19,6 +19,9 @@ check: lint test  ## what CI runs
 
 clean:
 	rm -rf .pytest_cache .ruff_cache **/__pycache__
+
+manifest:  ## Stage 1.1: list 10-Ks on EDGAR, write data/manifest.csv
+	uv run python -m finfilings.ingest.list_filings
 
 # Pipeline targets are filled in by later stages.
 data:

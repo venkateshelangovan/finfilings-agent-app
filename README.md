@@ -7,7 +7,7 @@ from plain RAG to a LangGraph agent, measuring accuracy, faithfulness, latency a
 
 > **Not financial advice.** Research project on public SEC filings only. No PII, no market data.
 
-![status](https://img.shields.io/badge/status-Stage%200%20done-blue)
+![status](https://img.shields.io/badge/status-Stage%201%20in%20progress-blue)
 
 ## Research question
 
@@ -18,8 +18,8 @@ question types, and at what cost in latency and money?
 
 | Stage | What | State |
 |---|---|---|
-| 0 | Scope, repo setup, decisions | **done (pending your local check)** |
-| 1 | Data acquisition (EDGAR) | next |
+| 0 | Scope, repo setup, decisions | done |
+| 1 | Data acquisition (EDGAR) | **in progress**: 1.1 list filings (this PR), 1.2 download + hashes (next) |
 | 2 | Parsing and cleaning | - |
 | 3 | Chunking and indexing | - |
 | 4 | Baseline RAG | - |
@@ -43,6 +43,8 @@ cp .env.example .env     # fill in later stages; never commit .env
 make setup               # install deps + git hooks
 make check               # ruff + pytest (what CI runs)
 ```
+
+Stage 1.1: put your name and email in `.env` as `SEC_USER_AGENT`, then `make manifest` (or `uv run python -m finfilings.ingest.list_filings`).
 
 Later targets (`make data`, `make index`, `make eval`) are stubs until their stages land.
 
