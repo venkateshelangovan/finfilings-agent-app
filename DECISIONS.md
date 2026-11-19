@@ -73,3 +73,9 @@ Every choice and why. Add an entry whenever you pick between options. Status: `a
 - **Why a hash in meta.json:** if chunks.jsonl changes after the index was built, row i of the matrix would silently point at the wrong chunk. Loading refuses to run instead.
 - **Why group `ml`:** sentence-transformers pulls in PyTorch (about 1 GB). Keeping it out of the default sync keeps CI fast. `make setup` installs everything.
 - **Model:** `bge-small-en-v1.5` first (config value `embedding_model`), `bge-base` as an ablation in Stage 7. Queries get BGE's recommended instruction prefix; documents do not.
+
+## D-017: BM25 with rank-bm25, built in memory, over the same embed_text as the dense index (provisional, Stage 3)
+- **Why the same text:** dense and keyword results must refer to the same chunks, and the header `[PYPL 10-K 2025 | Item 1A]` lets exact company/year words match.
+- **Why in memory:** building takes about a second for ~2,000 chunks, and there is no file to go stale.
+- **Tokenizer:** lowercase, numbers kept whole (`0.93`, `1,234.5`), no stopword list (BM25's inverse document frequency already down-weights common words).
+- **Why both indexes:** embeddings capture meaning ("fraud losses" ~ "chargebacks"), BM25 captures exact terms and numbers. Stage 7 measures each alone and fused.

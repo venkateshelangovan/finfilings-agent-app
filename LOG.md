@@ -6,6 +6,10 @@ What was done, numbers obtained, what failed. Newest first.
 - Added `index/chunk.py` + `make chunks`, settings in `configs/chunking.yaml` (600 tokens target, 800 cap, 12% overlap). Each chunk keeps ticker, year, section, kind (text/table), char_span inside its section, an id like `PYPL-2025-1A-0007` and an `embed_text` with a `[PYPL 10-K 2025 | Item 1A]` header. 6 tests (29 total).
 - **Your run:** `make chunks`, paste the printed stats. I am looking at chunk count, token spread, and the share of tiny chunks.
 
+## 2026-11-19: Stage 3.3 (BM25)
+- Stage 3.2 merged. Added `index/bm25.py`: `BM25Index` over the same chunks (rank-bm25, in-memory, tokenizer keeps numbers like `0.93` whole, header makes tickers searchable), same filters and result format as the dense index, CLI. 39 tests pass.
+- **Your run:** the 3 queries in the PR. Paste the output.
+
 ## 2026-11-19: Stage 3.2 (dense index)
 - Stage 3.1 merged (1,973 chunks, 0.3% tiny). Added `index/embed.py` (bge-small, normalised vectors saved as `.npy` + `meta.json` with a hash of chunks.jsonl) and `retrieval/dense.py` (`DenseIndex`: cosine search with ticker/year/section filters, stale-index check, CLI). Heavy deps are in optional group `ml`; CI installs only dev tools. 35 tests pass (embedding itself is not unit-tested: needs the model download).
 - **Your run:** `uv sync --all-groups`, `make index`, then 3 queries (see PR). Paste the output.
