@@ -39,3 +39,13 @@ def test_table_kept_as_rows():
 def test_table_cell_does_not_split_words_across_spans():
     t = html_to_text("<table><tr><td>Disagreements w<span>ith</span> Accountants</td></tr></table>")
     assert "Disagreements with Accountants" in t
+
+
+def test_nested_layout_table_does_not_duplicate_markers():
+    html = (
+        "<table><tr><td><table><tr><td>Revenue</td><td>1,000</td></tr></table></td></tr></table>"
+        "<table><tr><td><table></table></td></tr></table>"
+    )
+    t = html_to_text(html)
+    assert t.count("[TABLE]") == 1 and t.count("[/TABLE]") == 1
+    assert "Revenue | 1,000" in t

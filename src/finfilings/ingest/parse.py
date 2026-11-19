@@ -25,6 +25,11 @@ TOC_HEADER = re.compile(r"^table of contents$", re.I)
 
 
 def _table_to_text(table) -> str:
+    # Inner tables are converted first (see html_to_text). If one is inside this table, this
+    # one is only a layout wrapper: keep the inner content and do not add markers again.
+    if "[TABLE]" in table.get_text():
+        cells = (c.get_text().strip() for c in table.find_all(["td", "th"]))
+        return "\n".join(c for c in cells if c)
     lines = []
     for tr in table.find_all("tr"):
         cells = [re.sub(r"\s+", " ", c.get_text("")).strip() for c in tr.find_all(["td", "th"])]

@@ -7,7 +7,7 @@ from plain RAG to a LangGraph agent, measuring accuracy, faithfulness, latency a
 
 > **Not financial advice.** Research project on public SEC filings only. No PII, no market data.
 
-![status](https://img.shields.io/badge/status-Stage%202%20in%20progress-blue)
+![status](https://img.shields.io/badge/status-Stage%203%20in%20progress-blue)
 
 ## Research question
 
@@ -20,8 +20,8 @@ question types, and at what cost in latency and money?
 |---|---|---|
 | 0 | Scope, repo setup, decisions | done |
 | 1 | Data acquisition (EDGAR) | done (6 filings, hashes in manifest) |
-| 2 | Parsing and cleaning | **in progress**: 2.1-2.3 done; 2.4 QA checks (this PR) |
-| 3 | Chunking and indexing | - |
+| 2 | Parsing and cleaning | done |
+| 3 | Chunking and indexing | **in progress**: 3.1 chunking (this PR); 3.2 embeddings + dense index, 3.3 BM25 next |
 | 4 | Baseline RAG | - |
 | 5 | Evaluation dataset | - |
 | 6 | Evaluation harness | - |
@@ -55,6 +55,8 @@ Stage 2.2: `make sections` splits the text into Items 1, 1A, 7, 7A, 8, 15 and wr
 Stage 2.3: `make facts` pulls exact numbers (revenue, net income, provision, assets, ...) from SEC XBRL into `data/processed/facts.csv`.
 
 Stage 2.4: `make qa` checks the parsed sections and fails if anything looks wrong; `uv run python -m finfilings.ingest.qa --sample` prints 5 sections to read by eye.
+
+Stage 3.1: `make chunks` writes `data/processed/chunks.jsonl` (section-aware chunks, tables kept separate, char spans for citations).
 
 Later targets (`make index`, `make eval`) are stubs until their stages land.
 

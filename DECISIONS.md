@@ -54,3 +54,15 @@ Every choice and why. Add an entry whenever you pick between options. Status: `a
 - **Evidence:** `xbrl show` for the tags PayPal and Coinbase could use returned nothing for our filings' accession numbers. The tags exist only in other filings. Companyfacts exposes standard taxonomies only, and a company's own extension tags (e.g. PayPal's "transaction and credit losses" line) are not included.
 - **Decision:** keep `provision_for_credit_losses` as an optional metric. Affirm has it (`ProvisionForLoanLossesExpensed`). For PYPL and COIN the facts tool must return "not available" and the agent falls back to the MD&A text, which is a real case for the agentic fallback in Stage 8.
 - **Not done:** parsing the numbers out of income-statement tables to fill the gap. Revisit only if numeric questions on these two fail.
+
+## D-014: chunk size measured by estimated tokens (chars / 4), cut at line or sentence ends (provisional, Stage 3)
+- **Why estimate:** a real tokenizer needs a model download and makes tests and CI depend on the network. chars/4 is the usual rule of thumb for English; errors only blur the size by a few percent, which is far below the effect of the 400-800 token range we ablate in Stage 7.
+- **Why cut at natural boundaries:** a chunk that ends mid-sentence is harder to retrieve and to quote. Cuts prefer a line break, then a sentence end, then a space.
+- **Why overlap = 12% of the chunk:** text near a cut would otherwise lose context from its neighbour. Overlapping chunks are also verbatim substrings of the section, so `char_span` always points at the exact source passage.
+- **Tables:** one chunk per table; a table over the 800-token cap is split by rows, each piece re-wrapped in [TABLE] markers.
+- **Known weakness:** column headers (years) may be in a different row or chunk than the numbers; judged on retrieval results in Stage 7.
+
+## D-015: merge chunks under 100 estimated tokens into a neighbour (provisional, Stage 3)
+- **Evidence:** first real run gave 2,558 chunks, median 388 tokens (target 600) and **23% of chunks under 100 tokens**, mostly from short prose lines next to tables, one-row tables and the leftover tail after an overlap.
+- **Decision:** merge a tiny chunk with its neighbour when the result stays under the 800-token cap and both are verbatim text (so `char_span` still equals the exact source text). Setting `min_chunk_tokens: 0` turns it off, so Stage 7 can ablate it.
+- **Why it matters:** a 40-token chunk matches many queries weakly and competes with real content in top-k.
