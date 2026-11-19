@@ -36,3 +36,7 @@ Every choice and why. Add an entry whenever you pick between options. Status: `a
 
 ## D-009: original 10-K only, skip 10-K/A amendments (accepted, Stage 1)
 - **Why:** amendments are often partial (e.g. only Part III) and would create duplicate or incomplete documents. Revisit if a company's original is missing.
+
+## D-010: tables kept as [TABLE] row blocks, one line per row (provisional, Stage 2)
+- **Why:** flattening a table into prose scrambles numbers from different columns. Keeping rows with ' | ' separators preserves which number belongs to which label, and the markers let Stage 3 chunk tables on their own.
+- **Known limit:** column headers (years) can sit in separate rows; judged on real output before changing.
