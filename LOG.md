@@ -2,6 +2,10 @@
 
 What was done, numbers obtained, what failed. Newest first.
 
+## 2026-11-19: Stage 1.2 (download + hashes)
+- Added `ingest/download.py`: reads manifest, downloads missing files to `data/raw/<TICKER>/`, writes SHA-256 back, re-verifies. Skips files that already match (idempotent).
+- 2 new tests (hash, verify). **Not run against real EDGAR**; your run: `make manifest` then `make data`.
+
 ## 2026-11-19: Stage 1.1 (list filings, no download yet)
 - Added `ingest/edgar.py` (submissions API client, 10-K picker, fair-access sleep + User-Agent) and `ingest/list_filings.py` (writes `data/manifest.csv` with blank sha256).
 - Unit tests use a fake submissions JSON; no network in CI. 5 tests pass in sandbox.
