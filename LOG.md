@@ -2,6 +2,11 @@
 
 What was done, numbers obtained, what failed. Newest first.
 
+## 2026-11-19: Stage 2.1 (HTML to clean text)
+- Stage 1 done: 6 filings downloaded, hashes in manifest, `companies.yaml` marked `verified: true`.
+- Added `ingest/parse.py`: drops scripts, hidden XBRL header and display:none blocks; keeps tables as `[TABLE]` row blocks; removes page numbers and repeated "Table of Contents" lines.
+- 3 tests on a synthetic HTML fixture (10 total pass). **Not run on real filings** (no EDGAR access here). Your run: `make text`, paste the output lines.
+
 ## 2026-11-19: Stage 1.2 (download + hashes)
 - Added `ingest/download.py`: reads manifest, downloads missing files to `data/raw/<TICKER>/`, writes SHA-256 back, re-verifies. Skips files that already match (idempotent).
 - 2 new tests (hash, verify). **Not run against real EDGAR**; your run: `make manifest` then `make data`.

@@ -1,7 +1,6 @@
 # Companies and fiscal years in scope. MVP = 3 companies (see DECISIONS.md D-004).
-# CIKs and fiscal years are provisional: Stage 1 verifies them against EDGAR
-# (submissions API) before any download. Do not trust until verified.
-verified: false
+# CIKs and fiscal years verified against EDGAR in Stage 1 (manifest.csv has all 6 filings).
+verified: true
 companies:
   - ticker: PYPL
     name: PayPal Holdings, Inc.
