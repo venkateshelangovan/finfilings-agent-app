@@ -3,7 +3,9 @@ import re
 from finfilings.config import ChunkingConfig
 from finfilings.index.chunk import chunk_section
 
-CFG = ChunkingConfig(chunk_tokens=60, max_chunk_tokens=80, chars_per_token=4, overlap_ratio=0.15)
+CFG = ChunkingConfig(
+    chunk_tokens=60, max_chunk_tokens=80, min_chunk_tokens=15, chars_per_token=4, overlap_ratio=0.15
+)
 # target = 240 chars, overlap = 36 chars, max table chunk = 320 chars
 
 SENT = "Fraud losses are a growing risk for our business. "
@@ -18,7 +20,7 @@ def run(text):
 def test_prose_chunks_respect_size_and_cover_everything():
     chunks = run(PROSE)
     assert len(chunks) > 3
-    assert all(len(c["text"]) <= 240 for c in chunks)
+    assert all(len(c["text"]) <= 320 for c in chunks)
     covered = set()
     for c in chunks:
         covered.update(range(*c["char_span"]))
@@ -65,5 +67,19 @@ def test_ids_unique_and_header_added():
 
 def test_text_without_spaces_still_terminates():
     chunks = run("x" * 2000)
-    assert len(chunks) >= 8
-    assert all(len(c["text"]) <= 240 for c in chunks)
+    assert len(chunks) >= 6
+    assert all(len(c["text"]) <= 320 for c in chunks)
+
+
+def test_tiny_chunks_are_merged_but_never_exceed_the_cap():
+    text = "ITEM 7. MD&A\n\n" + TABLE[:60] + "\n[/TABLE]\n" + (SENT * 6 + "\n") * 4
+    cfg = ChunkingConfig(
+        chunk_tokens=60, max_chunk_tokens=80, min_chunk_tokens=15, chars_per_token=4
+    )
+    chunks = chunk_section(text, "AAA", 2024, "7", cfg)
+    assert all(len(c["text"]) <= 320 for c in chunks)
+    assert "ITEM 7. MD&A" in chunks[0]["text"] and len(chunks[0]["text"]) > 60  # heading not alone
+    for c in chunks:
+        if c["kind"] == "text" or len(c["text"]) < 320:
+            s, e = c["char_span"]
+            assert text[s:e] == c["text"]

@@ -6,6 +6,11 @@ What was done, numbers obtained, what failed. Newest first.
 - Added `index/chunk.py` + `make chunks`, settings in `configs/chunking.yaml` (600 tokens target, 800 cap, 12% overlap). Each chunk keeps ticker, year, section, kind (text/table), char_span inside its section, an id like `PYPL-2025-1A-0007` and an `embed_text` with a `[PYPL 10-K 2025 | Item 1A]` header. 6 tests (29 total).
 - **Your run:** `make chunks`, paste the printed stats. I am looking at chunk count, token spread, and the share of tiny chunks.
 
+## 2026-11-19: Stage 3.1b (tiny chunks)
+- **Real run (before fix):** 2,558 chunks (732 table), est. tokens min 4 / p10 42 / median 388 / p90 581 / max 799; **594 chunks (23.2%) under 100 tokens**. Per filing: PYPL 307+496, AFRM 418+412, COIN 468+457.
+- Fix: `min_chunk_tokens: 100` merges tiny chunks into a neighbour when it fits under the cap (D-015); stats now break tiny chunks down by kind with examples.
+- **Your run:** `make chunks` again; target is a small tiny-chunk share (under ~5%) and a median closer to 500.
+
 ## 2026-11-19: Stage 2.4 (QA checks)
 - Added `ingest/qa.py` + `make qa`: required Items present (1, 1A, 7), each section starts with its own heading, minimum sizes, no section >10x its peers' median, and Item 8 or 15 is large (PayPal keeps financials in 15). 6 tests (23 total).
 - **Your run:** `make qa`, then `uv run python -m finfilings.ingest.qa --sample` and read the 5 sections. Paste the QA result and tell me if any sample looks wrong.

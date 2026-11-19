@@ -86,6 +86,27 @@ def _table_pieces(text: str, a: int, b: int, max_chars: int) -> list[tuple[int, 
     return pieces
 
 
+def _merge_small(text, raw, min_chars, max_chars):
+    """Merge a chunk smaller than min_chars with its neighbour when the result still fits.
+
+    Tiny chunks (a heading line, a one-row table, the tail left after an overlap) carry
+    almost no meaning on their own and clutter the index. Only verbatim chunks are merged,
+    so the merged chunk is still exactly text[start:end] and its char_span stays honest.
+    """
+    out: list[tuple[int, int, str, str, bool]] = []
+    for item in raw:
+        if out:
+            ps, pe, pt, pk, pv = out[-1]
+            s, e, t, k, v = item
+            small = len(pt) < min_chars or len(t) < min_chars
+            if small and pv and v and max(e, pe) - ps <= max_chars:
+                kind = "table" if "table" in (pk, k) else "text"
+                out[-1] = (ps, max(e, pe), text[ps : max(e, pe)], kind, True)
+                continue
+        out.append(item)
+    return out
+
+
 def chunk_section(
     text: str, ticker: str, year: int, section: str, cfg: ChunkingConfig
 ) -> list[dict]:
@@ -93,20 +114,21 @@ def chunk_section(
     overlap = int(target * cfg.overlap_ratio)
     max_chars = int(cfg.max_chunk_tokens * cfg.chars_per_token)
 
-    raw: list[tuple[int, int, str, str]] = []  # start, end, text, kind
+    raw: list[tuple[int, int, str, str, bool]] = []  # start, end, text, kind, verbatim
     cursor = 0
     for m in [*TABLE_RE.finditer(text), None]:
         prose_end = m.start() if m else len(text)
         for s, e in _prose_spans(text, cursor, prose_end, target, overlap):
-            raw.append((s, e, text[s:e], "text"))
+            raw.append((s, e, text[s:e], "text", True))
         if m:
             for s, e, t in _table_pieces(text, m.start(), m.end(), max_chars):
-                raw.append((s, e, t, "table"))
+                raw.append((s, e, t, "table", t == text[s:e]))
             cursor = m.end()
     raw.sort(key=lambda r: r[0])
+    raw = _merge_small(text, raw, int(cfg.min_chunk_tokens * cfg.chars_per_token), max_chars)
 
     chunks = []
-    for i, (s, e, t, kind) in enumerate(raw):
+    for i, (s, e, t, kind, _) in enumerate(raw):
         chunks.append(
             {
                 "chunk_id": f"{ticker}-{year}-{section}-{i:04d}",
@@ -142,8 +164,12 @@ def main() -> None:
         f"est. tokens: min {toks[0]}, p10 {q(0.1)}, median {int(statistics.median(toks))}, "
         f"p90 {q(0.9)}, max {toks[-1]}"
     )
-    small = sum(t < 100 for t in toks)
-    print(f"chunks under 100 est. tokens: {small:,} ({small / len(toks):.1%})")
+    tiny = [c for c in all_chunks if c["n_tokens_est"] < 100]
+    print(f"chunks under 100 est. tokens: {len(tiny):,} ({len(tiny) / len(toks):.1%})")
+    for kind in ("text", "table"):
+        print(f"  tiny {kind}: {sum(c['kind'] == kind for c in tiny):,}")
+    for c in tiny[:6]:
+        print(f"  e.g. {c['chunk_id']} ({c['kind']}): {c['text'][:70]!r}")
     per_filing: dict[str, int] = {}
     for c in all_chunks:
         key = f"{c['ticker']}_{c['year']}"

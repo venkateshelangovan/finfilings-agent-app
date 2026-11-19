@@ -45,6 +45,7 @@ def load_companies(path: Path | None = None) -> CompaniesConfig:
 class ChunkingConfig(BaseModel):
     chunk_tokens: int = Field(600, gt=50)
     max_chunk_tokens: int = Field(800, gt=50)
+    min_chunk_tokens: int = Field(100, ge=0)
     chars_per_token: float = Field(4, gt=0)
     overlap_ratio: float = Field(0.12, ge=0, le=0.3)
     cross_section: bool = False

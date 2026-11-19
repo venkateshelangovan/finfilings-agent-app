@@ -61,3 +61,8 @@ Every choice and why. Add an entry whenever you pick between options. Status: `a
 - **Why overlap = 12% of the chunk:** text near a cut would otherwise lose context from its neighbour. Overlapping chunks are also verbatim substrings of the section, so `char_span` always points at the exact source passage.
 - **Tables:** one chunk per table; a table over the 800-token cap is split by rows, each piece re-wrapped in [TABLE] markers.
 - **Known weakness:** column headers (years) may be in a different row or chunk than the numbers; judged on retrieval results in Stage 7.
+
+## D-015: merge chunks under 100 estimated tokens into a neighbour (provisional, Stage 3)
+- **Evidence:** first real run gave 2,558 chunks, median 388 tokens (target 600) and **23% of chunks under 100 tokens**, mostly from short prose lines next to tables, one-row tables and the leftover tail after an overlap.
+- **Decision:** merge a tiny chunk with its neighbour when the result stays under the 800-token cap and both are verbatim text (so `char_span` still equals the exact source text). Setting `min_chunk_tokens: 0` turns it off, so Stage 7 can ablate it.
+- **Why it matters:** a 40-token chunk matches many queries weakly and competes with real content in top-k.
