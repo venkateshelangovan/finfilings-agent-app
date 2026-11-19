@@ -2,6 +2,10 @@
 
 What was done, numbers obtained, what failed. Newest first.
 
+## 2026-11-19: Stage 2.4 (QA checks)
+- Added `ingest/qa.py` + `make qa`: required Items present (1, 1A, 7), each section starts with its own heading, minimum sizes, no section >10x its peers' median, and Item 8 or 15 is large (PayPal keeps financials in 15). 6 tests (23 total).
+- **Your run:** `make qa`, then `uv run python -m finfilings.ingest.qa --sample` and read the 5 sections. Paste the QA result and tell me if any sample looks wrong.
+
 ## 2026-11-19: Stage 2.3b (provision metric)
 - Tag finder showed all candidate tags are standard us-gaap, not extensions. `show` returned **no entries for our accession numbers** for PYPL (ProvisionForLoanLeaseAndOtherLosses) and COIN (ProvisionForDoubtfulAccounts), so those companies' provision line is not available via companyfacts (D-013). Affirm tag `ProvisionForLoanLossesExpensed` added.
 - **Your run:** `make facts`; expect AFRM 7/7, PYPL and COIN 6/7.
