@@ -2,6 +2,19 @@
 
 What was done, numbers obtained, what failed. Newest first.
 
+## 2026-11-19: Stage 2.3 (XBRL facts)
+- **Real results:** `make sections` found all 6 Items in all 6 filings (PYPL Item 8 = 260-301 chars, a pointer; its statements are in Item 15 at ~216k chars). `make facts`: 6/7 metrics for every filing; `provision_for_credit_losses` missing everywhere, probably because it is tagged in a company extension namespace (my code only read us-gaap). Added `find` helper: `uv run python -m finfilings.ingest.xbrl find provision`.
+- Added `ingest/xbrl.py`: calls SEC `companyfacts`, keeps only values from each manifest filing (matched by accession number), at that filing's fiscal year end, full-year duration for flow items. Tries several tags per metric and records which one matched (`source_tag`).
+- 2 tests with a fake companyfacts JSON (15 pass total). **Not run on real SEC data.**
+- **Your run:** `make facts`, paste the output. Any `missing:` metric means that company uses a tag I did not list; we add it from the real data.
+
+## 2026-11-19: Stage 2.2 (sections)
+- Real output of `make text`: PYPL 465-475k chars (209-213 tables), AFRM 549-558k (113), COIN 652-683k (95).
+- Findings from the Item-heading grep: ToC rows contain ' | ' and page numbers; body headings are ALL CAPS (`ITEM 1A. RISK FACTORS`) except AFRM Item 1A (`Item 1A. Risk Factors`). **PayPal's Item 8 is a 8-line pointer; its financial statements are under Item 15**, so Item 15 is kept too.
+- Found bug: table cells split words across inline spans (`Disagreements w ith`). Fixed by joining cell text without a separator; test added.
+- `ingest/sections.py`: skips ' | ' lines, first body heading per Item, section ends at next heading. 12 tests pass. Terminal `ΓÇÖ` seen in cmd is only console display of UTF-8 (not a file bug).
+- **Your run:** `make text` (re-run for the fix) then `make sections`, paste output.
+
 ## 2026-11-19: Stage 2.1 (HTML to clean text)
 - Stage 1 done: 6 filings downloaded, hashes in manifest, `companies.yaml` marked `verified: true`.
 - Added `ingest/parse.py`: drops scripts, hidden XBRL header and display:none blocks; keeps tables as `[TABLE]` row blocks; removes page numbers and repeated "Table of Contents" lines.

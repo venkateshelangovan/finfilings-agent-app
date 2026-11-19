@@ -27,7 +27,7 @@ TOC_HEADER = re.compile(r"^table of contents$", re.I)
 def _table_to_text(table) -> str:
     lines = []
     for tr in table.find_all("tr"):
-        cells = [re.sub(r"\s+", " ", c.get_text(" ")).strip() for c in tr.find_all(["td", "th"])]
+        cells = [re.sub(r"\s+", " ", c.get_text("")).strip() for c in tr.find_all(["td", "th"])]
         cells = [c for c in cells if c and c not in {"$", ")", "%"}]
         if cells:
             lines.append(" | ".join(cells))

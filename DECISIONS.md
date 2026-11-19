@@ -40,3 +40,12 @@ Every choice and why. Add an entry whenever you pick between options. Status: `a
 ## D-010: tables kept as [TABLE] row blocks, one line per row (provisional, Stage 2)
 - **Why:** flattening a table into prose scrambles numbers from different columns. Keeping rows with ' | ' separators preserves which number belongs to which label, and the markers let Stage 3 chunk tables on their own.
 - **Known limit:** column headers (years) can sit in separate rows; judged on real output before changing.
+
+## D-011: keep Items 1, 1A, 7, 7A, 8 and 15 (accepted, Stage 2)
+- **Why:** the real PayPal filing puts the financial statements and notes under Item 15 (Item 8 only points to it). Keeping 15 for every company is simpler than per-company rules; for AFRM and COIN it is mostly exhibits and is small. Items 2-6, 9-14 and 16 are not needed for our question types.
+- **Boundary rule:** a section ends at the next Item heading of any kind, so Item 1A ends at 1B even though 1B is not kept.
+
+## D-012: facts stored as CSV, not parquet; match by accession number (provisional, Stage 2)
+- **Why CSV:** the table is tiny (about 40 rows). Parquet would add pandas and pyarrow for no benefit. Can switch later without changing callers.
+- **Why accession:** a 10-K also contains prior-year numbers and later filings restate them. Taking only values tagged with the filing's own accession, at its own period end, makes each number traceable to one document, which is what citations need.
+- **Why several tags per metric:** companies tag the same concept differently (e.g. revenue). The tag used is stored in `source_tag`.
