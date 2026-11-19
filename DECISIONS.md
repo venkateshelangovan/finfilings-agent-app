@@ -66,3 +66,10 @@ Every choice and why. Add an entry whenever you pick between options. Status: `a
 - **Evidence:** first real run gave 2,558 chunks, median 388 tokens (target 600) and **23% of chunks under 100 tokens**, mostly from short prose lines next to tables, one-row tables and the leftover tail after an overlap.
 - **Decision:** merge a tiny chunk with its neighbour when the result stays under the 800-token cap and both are verbatim text (so `char_span` still equals the exact source text). Setting `min_chunk_tokens: 0` turns it off, so Stage 7 can ablate it.
 - **Why it matters:** a 40-token chunk matches many queries weakly and competes with real content in top-k.
+
+## D-016: exact search with numpy, no vector database; embeddings in an optional dependency group (provisional, Stage 3)
+- **Why no FAISS/Chroma:** about 2,000 chunks x 384 numbers is a 3 MB matrix. One matrix-vector product scores every chunk in well under a millisecond, and metadata filters are plain boolean masks. A vector database would add an install risk and a moving part with no speed benefit. Revisit above ~100k chunks.
+- **Why normalised vectors:** for unit-length vectors the dot product equals cosine similarity.
+- **Why a hash in meta.json:** if chunks.jsonl changes after the index was built, row i of the matrix would silently point at the wrong chunk. Loading refuses to run instead.
+- **Why group `ml`:** sentence-transformers pulls in PyTorch (about 1 GB). Keeping it out of the default sync keeps CI fast. `make setup` installs everything.
+- **Model:** `bge-small-en-v1.5` first (config value `embedding_model`), `bge-base` as an ablation in Stage 7. Queries get BGE's recommended instruction prefix; documents do not.

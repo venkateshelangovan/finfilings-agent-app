@@ -6,6 +6,10 @@ What was done, numbers obtained, what failed. Newest first.
 - Added `index/chunk.py` + `make chunks`, settings in `configs/chunking.yaml` (600 tokens target, 800 cap, 12% overlap). Each chunk keeps ticker, year, section, kind (text/table), char_span inside its section, an id like `PYPL-2025-1A-0007` and an `embed_text` with a `[PYPL 10-K 2025 | Item 1A]` header. 6 tests (29 total).
 - **Your run:** `make chunks`, paste the printed stats. I am looking at chunk count, token spread, and the share of tiny chunks.
 
+## 2026-11-19: Stage 3.2 (dense index)
+- Stage 3.1 merged (1,973 chunks, 0.3% tiny). Added `index/embed.py` (bge-small, normalised vectors saved as `.npy` + `meta.json` with a hash of chunks.jsonl) and `retrieval/dense.py` (`DenseIndex`: cosine search with ticker/year/section filters, stale-index check, CLI). Heavy deps are in optional group `ml`; CI installs only dev tools. 35 tests pass (embedding itself is not unit-tested: needs the model download).
+- **Your run:** `uv sync --all-groups`, `make index`, then 3 queries (see PR). Paste the output.
+
 ## 2026-11-19: Stage 3.1c (nested tables)
 - **Real run after merge fix:** 1,973 chunks (615 table), est. tokens min 7 / p10 186 / median 479 / p90 591 / max 799; tiny chunks 6 (0.3%). Per filing: PYPL 263+288, AFRM 329+326, COIN 386+381. Target met.
 - Found junk chunk `PYPL-2024-1A-0011` = `[TABLE]\n\n[TABLE]\n[/TABLE]`: a layout table wrapping an inner table made the parser emit nested markers. Fix: a table that contains an already-converted table is unwrapped, no second markers; chunker also drops marker-only chunks. 2 tests (32 total).
